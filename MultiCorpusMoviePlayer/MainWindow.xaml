@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiCorpusMoviePlayer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="800" Width="1000">
     <Grid>
-        
+        <MediaElement Name="MoviePlayer" Margin="0,70,-0.4,99.4"></MediaElement>
+        <Button Name="Play" Content="PLAY!" Margin="10,697,856.6,21.4" Click="Play_Click"></Button>
+        <Button Name="OpenFile" Content="Open" Click="OpenFile_Click" Margin="10,10,846.6,705.4"></Button>
+        <TextBlock Name="FileName" Text="めう" Margin="175,23,-23.4,705.4" FontSize="18"></TextBlock>
+        <Slider Name="SliderTime" Margin="142,720,9.6,21.4"></Slider>
     </Grid>
 </Window>
