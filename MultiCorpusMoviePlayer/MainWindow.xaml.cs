@@ -1,6 +1,8 @@
-﻿using Microsoft.Win32;
+﻿using KinectWPF;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +16,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 
 namespace MultiCorpusMoviePlayer
 {
@@ -25,10 +28,14 @@ namespace MultiCorpusMoviePlayer
         //ストーリーボード
         Storyboard storyboard = null;
 
-        string fileName = "";
+        string movieFileName = "";
+        string labelFileName = "";
 
         //再生中かどうか
         bool isPlaying = false;
+
+        //label用のクラス
+        TimeLineLabel timeLineLabel;
 
         public MainWindow()
         {
@@ -38,7 +45,7 @@ namespace MultiCorpusMoviePlayer
         private void PlayMovie()
         {
             //メディアタイムラインを作成
-            MediaTimeline mediaTimeline = new MediaTimeline(new Uri(fileName));
+            MediaTimeline mediaTimeline = new MediaTimeline(new Uri(movieFileName));
             mediaTimeline.CurrentTimeInvalidated += new EventHandler(mediaTimeline_CurrentTimeInvalidated);
             Storyboard.SetTargetName(mediaTimeline, MoviePlayer.Name);
 
@@ -72,6 +79,15 @@ namespace MultiCorpusMoviePlayer
 
         }
 
+        private void DrawLabel(double width, double left, Brush brush)
+        {
+            var rectangle = new Rectangle() { Width = width, Height = Label.Height, Fill = brush };
+            Canvas.SetTop(rectangle, 0);
+            Canvas.SetLeft(rectangle, left);
+
+            Label.Children.Add(rectangle);
+        }
+
         private void Play_Click(object sender, RoutedEventArgs e)
         {
             //何も再生されていないときは新しく再生を始める
@@ -103,9 +119,9 @@ namespace MultiCorpusMoviePlayer
                 return;
 
             //ファイル名を保存する
-            fileName = openFileDialog.FileName;
+            movieFileName = openFileDialog.FileName;
             //開いたファイルを表示
-            FileName.Text = fileName.Split("\\"[0]).LastOrDefault();
+            FileName.Text = movieFileName.Split("\\"[0]).LastOrDefault();
 
             if(storyboard != null)
             {
@@ -155,6 +171,70 @@ namespace MultiCorpusMoviePlayer
             {
                 storyboard.Resume(this);
             }
+        }
+
+        private void OpenLabelFile_Click(object sender, RoutedEventArgs e)
+        {
+            // ファイルを開くダイアログボックスを表示
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "";
+            if (openFileDialog.ShowDialog() != true)
+                return;
+
+            //ファイル名を保存する
+            labelFileName = openFileDialog.FileName;
+
+            LoadLabelJsonData(labelFileName);
+            AddLabel();
+        }
+
+        private void LoadLabelJsonData(string filePath)
+        {
+            string jsonContent;
+            using (var sr = new StreamReader(filePath))
+            {
+                jsonContent = sr.ReadLine();
+            }
+
+            timeLineLabel = JsonConvert.DeserializeObject<TimeLineLabel>(jsonContent);
+        }
+
+        private void AddLabel()
+        {
+            //1ミリ秒あたりの横のピクセル数を計算する
+            double widthParPixcel = Label.Width / MoviePlayer.NaturalDuration.TimeSpan.TotalMilliseconds;
+
+            foreach(var label in timeLineLabel.Labels)
+            {
+                double left, width;
+                Brush color;
+
+                left =TimeSpan.Parse(label.StartTime).TotalMilliseconds * widthParPixcel;
+                width = (TimeSpan.Parse(label.EndTime).TotalMilliseconds - TimeSpan.Parse(label.StartTime).TotalMilliseconds) * widthParPixcel;
+                switch (label.LabelType)
+                {
+                    case "RightSpeak":
+                        color = Brushes.Yellow;
+                        break;
+                    case "LeftSpeak":
+                        color = Brushes.Azure;
+                        break;
+                }
+                try
+                {
+                    DrawLabel(width, left, Brushes.Yellow);
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Label.IsEnabled = true;
         }
     }
 }

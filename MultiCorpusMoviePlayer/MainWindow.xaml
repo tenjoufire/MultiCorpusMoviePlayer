@@ -5,13 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiCorpusMoviePlayer"
         mc:Ignorable="d"
+        Loaded="Window_Loaded"
         Title="MainWindow" Height="800" Width="1000">
     <Grid>
         <MediaElement Name="MoviePlayer" Margin="0,70,-0.4,99.4" MediaOpened="MoviePlayer_MediaOpened"></MediaElement>
         <Button Name="Play" Content="PLAY!" IsEnabled="False" Margin="10,697,925.6,21.4" Click="Play_Click"></Button>
-        <Button Name="OpenFile" Content="Open" Click="OpenFile_Click" Margin="10,10,846.6,705.4"></Button>
-        <TextBlock Name="FileName" Text="めう" Margin="175,23,-23.4,705.4" FontSize="18"></TextBlock>
-        <Slider Name="SliderTime" Margin="142,720,9.6,21.4" IsEnabled="False" Thumb.DragStarted="SliderTime_DragStarted" Thumb.DragCompleted="SliderTime_DragCompleted"></Slider>
+        <Button Name="OpenFile" Content="MovieOpen" Click="OpenFile_Click" Margin="10,10,846.6,705.4"></Button>
+        <Button Name="OpenLabelFile" Content="LabelOpen" Click="OpenLabelFile_Click" Margin="152,10,714.6,705.4"></Button>
+        <TextBlock Name="FileName" Text="めう" Margin="295,23,-23.4,705.4" FontSize="18"></TextBlock>
+        <Slider Name="SliderTime" Margin="142,731,9.6,10.4" IsEnabled="False" Thumb.DragStarted="SliderTime_DragStarted" Thumb.DragCompleted="SliderTime_DragCompleted"></Slider>
         <Button x:Name="Stop" Content="Stop" IsEnabled="False" Margin="78,714,881.6,21.4" Click="Stop_Click"/>
+        <Canvas x:Name="Label" Width="840" Height="30" Margin="142,696,51.6,44.4"/>
     </Grid>
 </Window>
