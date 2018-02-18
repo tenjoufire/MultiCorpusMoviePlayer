@@ -38,6 +38,7 @@ namespace MultiCorpusMoviePlayer
         TimeLineLabel timeLineLabel;
 
         LabelControll labelControll;
+        private bool isKeyDown = false;
 
         public MainWindow()
         {
@@ -241,20 +242,25 @@ namespace MultiCorpusMoviePlayer
 
         private void RecStartButton_Click(object sender, RoutedEventArgs e)
         {
+            //ラベル記録準備
             saveLabelFileName.IsEnabled = false;
             enableName.IsEnabled = false;
             disableName.IsEnabled = false;
             rectAngle.Stroke = Brushes.Red;
+            OffsetString.Text = "0.0"; //オフセットはiCorpusStudio上で設定した値が正の値なら負の値で設定する
 
+            //ラベル記録クラスのインスタンス生成
             labelControll = new LabelControll(saveLabelFileName.Text, enableName.Text, disableName.Text);
         }
 
         private void RecExportButton_Click(object sender, RoutedEventArgs e)
         {
+            //ラベル記録終了処理
             saveLabelFileName.IsEnabled = true;
             enableName.IsEnabled = true;
             disableName.IsEnabled = true;
             rectAngle.Stroke = Brushes.Black;
+            //ラベルエクスポート
             if (labelControll != null) labelControll.ExportLabelCSV();
         }
 
@@ -262,18 +268,20 @@ namespace MultiCorpusMoviePlayer
         {
             if (e.Key == Key.Return)
             {
-                if(labelControll != null) labelControll.SetStartTimeString(MoviePlayer.Clock.CurrentTime.Value.TotalSeconds.ToString());
+                //isKeyDownがないと連続イベントが発火の影響を受け開始時間が正常に記録されない
+                if(labelControll != null && !isKeyDown) labelControll.SetStartTimeString((MoviePlayer.Clock.CurrentTime.Value.TotalSeconds + Double.Parse(OffsetString.Text)).ToString());
                 rectAngle.Fill = Brushes.Red;
+                isKeyDown = true;
             }
         }
 
         private void Button_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Return)
-
             {
-                if (labelControll != null) labelControll.SetEndTimeString(MoviePlayer.Clock.CurrentTime.Value.TotalSeconds.ToString());
+                if (labelControll != null) labelControll.SetEndTimeString((MoviePlayer.Clock.CurrentTime.Value.TotalSeconds + Double.Parse(OffsetString.Text)).ToString());
                 rectAngle.Fill = Brushes.Blue;
+                isKeyDown = false;
             }
         }
     }
