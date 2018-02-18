@@ -207,7 +207,7 @@ namespace MultiCorpusMoviePlayer
             foreach(var label in timeLineLabel.Labels)
             {
                 double left, width;
-                Brush color;
+                Brush color = Brushes.Black;
 
                 left =TimeSpan.Parse(label.StartTime).TotalMilliseconds * widthParPixcel;
                 width = (TimeSpan.Parse(label.EndTime).TotalMilliseconds - TimeSpan.Parse(label.StartTime).TotalMilliseconds) * widthParPixcel;
@@ -217,12 +217,12 @@ namespace MultiCorpusMoviePlayer
                         color = Brushes.Yellow;
                         break;
                     case "LeftSpeak":
-                        color = Brushes.Azure;
+                        color = Brushes.Blue;
                         break;
                 }
                 try
                 {
-                    DrawLabel(width, left, Brushes.Yellow);
+                    DrawLabel(width, left, color);
                 }
                 catch (Exception e)
                 {
@@ -235,6 +235,39 @@ namespace MultiCorpusMoviePlayer
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Label.IsEnabled = true;
+        }
+
+        private void RecStartButton_Click(object sender, RoutedEventArgs e)
+        {
+            saveLabelFileName.IsEnabled = false;
+            enableName.IsEnabled = false;
+            disableName.IsEnabled = false;
+
+            LabelControll labelControll = new LabelControll(saveLabelFileName.Text, enableName.Text, disableName.Text);
+        }
+
+        private void RecExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            saveLabelFileName.IsEnabled = true;
+            enableName.IsEnabled = true;
+            disableName.IsEnabled = true;
+        }
+
+        private void Button_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Return)
+            {
+                rectAngle.Fill = Brushes.Red;
+            }
+        }
+
+        private void Button_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+
+            {
+                rectAngle.Fill = Brushes.Blue;
+            }
         }
     }
 }
