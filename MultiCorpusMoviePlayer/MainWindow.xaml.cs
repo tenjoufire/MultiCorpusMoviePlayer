@@ -37,6 +37,8 @@ namespace MultiCorpusMoviePlayer
         //label用のクラス
         TimeLineLabel timeLineLabel;
 
+        LabelControll labelControll;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -91,9 +93,9 @@ namespace MultiCorpusMoviePlayer
         private void Play_Click(object sender, RoutedEventArgs e)
         {
             //何も再生されていないときは新しく再生を始める
-            if(storyboard == null)
+            if (storyboard == null)
             {
-                PlayMovie(); 
+                PlayMovie();
             }
             else //すでに再生されている場合は，一時停止か再び再生か
             {
@@ -123,7 +125,7 @@ namespace MultiCorpusMoviePlayer
             //開いたファイルを表示
             FileName.Text = movieFileName.Split("\\"[0]).LastOrDefault();
 
-            if(storyboard != null)
+            if (storyboard != null)
             {
                 StopMovie();
             }
@@ -133,11 +135,11 @@ namespace MultiCorpusMoviePlayer
 
         private void mediaTimeline_CurrentTimeInvalidated(object sender, EventArgs e)
         {
-            if(storyboard != null)
+            if (storyboard != null)
             {
                 SliderTime.Value = MoviePlayer.Clock.CurrentTime.Value.TotalMilliseconds;
 
-                if(MoviePlayer.NaturalDuration.HasTimeSpan && MoviePlayer.Clock.CurrentTime.Value.TotalMilliseconds == MoviePlayer.NaturalDuration.TimeSpan.TotalMilliseconds)
+                if (MoviePlayer.NaturalDuration.HasTimeSpan && MoviePlayer.Clock.CurrentTime.Value.TotalMilliseconds == MoviePlayer.NaturalDuration.TimeSpan.TotalMilliseconds)
                 {
                     StopMovie();
                 }
@@ -204,12 +206,12 @@ namespace MultiCorpusMoviePlayer
             //1ミリ秒あたりの横のピクセル数を計算する
             double widthParPixcel = Label.Width / MoviePlayer.NaturalDuration.TimeSpan.TotalMilliseconds;
 
-            foreach(var label in timeLineLabel.Labels)
+            foreach (var label in timeLineLabel.Labels)
             {
                 double left, width;
                 Brush color = Brushes.Black;
 
-                left =TimeSpan.Parse(label.StartTime).TotalMilliseconds * widthParPixcel;
+                left = TimeSpan.Parse(label.StartTime).TotalMilliseconds * widthParPixcel;
                 width = (TimeSpan.Parse(label.EndTime).TotalMilliseconds - TimeSpan.Parse(label.StartTime).TotalMilliseconds) * widthParPixcel;
                 switch (label.LabelType)
                 {
@@ -242,8 +244,9 @@ namespace MultiCorpusMoviePlayer
             saveLabelFileName.IsEnabled = false;
             enableName.IsEnabled = false;
             disableName.IsEnabled = false;
+            rectAngle.Stroke = Brushes.Red;
 
-            LabelControll labelControll = new LabelControll(saveLabelFileName.Text, enableName.Text, disableName.Text);
+            labelControll = new LabelControll(saveLabelFileName.Text, enableName.Text, disableName.Text);
         }
 
         private void RecExportButton_Click(object sender, RoutedEventArgs e)
@@ -251,12 +254,15 @@ namespace MultiCorpusMoviePlayer
             saveLabelFileName.IsEnabled = true;
             enableName.IsEnabled = true;
             disableName.IsEnabled = true;
+            rectAngle.Stroke = Brushes.Black;
+            if (labelControll != null) labelControll.ExportLabelCSV();
         }
 
         private void Button_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Return)
+            if (e.Key == Key.Return)
             {
+                if(labelControll != null) labelControll.SetStartTimeString(MoviePlayer.Clock.CurrentTime.Value.TotalSeconds.ToString());
                 rectAngle.Fill = Brushes.Red;
             }
         }
@@ -266,6 +272,7 @@ namespace MultiCorpusMoviePlayer
             if (e.Key == Key.Return)
 
             {
+                if (labelControll != null) labelControll.SetEndTimeString(MoviePlayer.Clock.CurrentTime.Value.TotalSeconds.ToString());
                 rectAngle.Fill = Brushes.Blue;
             }
         }
